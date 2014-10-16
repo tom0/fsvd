@@ -28,7 +28,8 @@
 
             let tilesOfInterest = findTile doc (ai doc)
 
-            moveHero doc.PlayUrl doc.Hero.Id tilesOfInterest
+            if not doc.Game.Finished then
+                moveHero doc.PlayUrl doc.Hero.Id tilesOfInterest
             
         let createGame =
             let response = Http.RequestString(uriBase, query = [ "key", apiKey; "turns", "300" ], headers = [ Accept Json ], httpMethod="POST")

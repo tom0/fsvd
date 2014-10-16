@@ -5,7 +5,7 @@
         type Response = JsonProvider<"./sample_response.json">
         
         type Direction = North | East | South | West | Stay
-        type Tile = Free | Forest | Mine of Option<int> | Hero of Option<int> | Tavern
+        type Tile = Free | Forest | Mine of Option<int> | Hero of int | Tavern
         type AdjVertex = { id: int; tile: Tile; direction: Direction }
         type BfsAdjVertex = { source: Option<BfsAdjVertex>; distance: int; vertex: AdjVertex }
 
@@ -15,7 +15,11 @@
             | { source = Some { source = None }; vertex = v } -> v.direction
             | { source = Some x } -> findFirstStep x
 
-        let direction tiles = tiles |> List.rev |> List.head |> findFirstStep |> sprintf "%A"
+        let direction tiles = 
+            match tiles with
+            | [] -> Stay
+            | x::xs -> xs |> List.rev |> List.head |> findFirstStep 
+            |> sprintf "%A"
 
         let distance (tiles:BfsAdjVertex list) = 
             let first = tiles |> List.head

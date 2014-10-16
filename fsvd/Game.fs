@@ -2,24 +2,26 @@
     module Game = 
     
         open Shared
-        
+  
         let parseHeroTile heroChar tileCtor = 
             match heroChar with
-            | '1' -> tileCtor (Some 1)
-            | '2' -> tileCtor (Some 2)
-            | '3' -> tileCtor (Some 3)
-            | '4' -> tileCtor (Some 4)
-            | _ -> tileCtor None
+            | '1' -> tileCtor 1
+            | '2' -> tileCtor 2
+            | '3' -> tileCtor 3
+            | '4' -> tileCtor 4
+
 
         let parseRow rowChars = 
             let rec innerParseRow rowChars acc =
                 match rowChars with
                 | [] -> List.rev acc
                 | '@'::x::xs -> innerParseRow xs ((parseHeroTile x Hero) :: acc)
-                | '$'::x::xs -> innerParseRow xs ((parseHeroTile x Mine) :: acc)
+                | '$'::'-'::xs -> innerParseRow xs ((Mine None) :: acc)
+                | '$'::x::xs -> innerParseRow xs ((parseHeroTile x (Some >> Mine)) :: acc)
                 | '['::_::xs -> innerParseRow xs (Tavern :: acc)
                 | ' '::_::xs -> innerParseRow xs (Free :: acc)
                 | _::_::xs -> innerParseRow xs (Forest :: acc)
+
             innerParseRow rowChars []
 
         //Jimmy method to parse string
@@ -33,6 +35,11 @@
             | Hero x as h -> Some(h)
             | Mine x as m -> Some(m)
             | _ -> None 
+        
+        let nullCollector tile = 
+            match tile with
+            | _ -> None 
+
 
         let rec bfs (work: BfsAdjVertex list) (adjacencyList:(Tile * seq<AdjVertex>)[]) (collector: Tile -> Option<Tile>) (visited:Set<int>) (acc:BfsAdjVertex list) : BfsAdjVertex list =
             match work with
