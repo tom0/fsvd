@@ -16,11 +16,11 @@
 
         let direction tiles = 
             match tiles with
-            | [] -> Stay
+            | [] | _::[] -> Stay
             | x::xs -> xs |> List.rev |> List.head |> findFirstStep 
             |> sprintf "%A"
 
         let distance (tiles:BfsAdjVertex list) = 
-            let first = tiles |> List.head
-
-            first.distance
+            match tiles with
+            | [] | _::[] -> None
+            | x::xs -> xs |> List.rev |> List.head |> (fun x -> Some x.distance)

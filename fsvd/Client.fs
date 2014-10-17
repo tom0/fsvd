@@ -22,5 +22,6 @@
 
             member this.CreateGame =
                 let url = (new Uri(new Uri(uriBase), (if live then "arena" else "training"))).ToString()
-                let response = Http.RequestString(url, query = [ "key", apiKey; "turns", turns], headers = headers, httpMethod="POST")
+                let body = sprintf """{ "turns": "%s" }""" turns
+                let response = Http.RequestString(url, query = [ "key", apiKey ], body = TextRequest body, headers = headers, httpMethod="POST")
                 Response.Parse(response)
