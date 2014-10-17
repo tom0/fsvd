@@ -1,9 +1,7 @@
 ﻿namespace Fsvd
 
     module Ai =
-    
         open Shared
-
 
         let mineCollector myHeroId tile =
             match tile with

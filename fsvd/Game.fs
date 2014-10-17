@@ -10,7 +10,6 @@
             | '3' -> tileCtor 3
             | '4' -> tileCtor 4
 
-
         let parseRow rowChars = 
             let rec innerParseRow rowChars acc =
                 match rowChars with
@@ -24,11 +23,6 @@
 
             innerParseRow rowChars []
 
-        //Jimmy method to parse string
-        //Converts string to list of vertices
-        //Use array of deltas to describe where adjacent tiles are
-        //For each vertex, look up deltas, add to new object
-
         let tavernHeroMineCollector tile = 
             match tile with
             | Tavern as t -> Some(t)
@@ -39,7 +33,6 @@
         let nullCollector tile = 
             match tile with
             | _ -> None 
-
 
         let rec bfs (work: BfsAdjVertex list) (adjacencyList:(Tile * seq<AdjVertex>)[]) (collector: Tile -> Option<Tile>) (visited:Set<int>) (acc:BfsAdjVertex list) : BfsAdjVertex list =
             match work with
@@ -82,13 +75,10 @@
                 let adjacencyList = vertexList |> Seq.mapi (fun i v -> v, adjacencyListPrepare i)
                 adjacencyList |> Seq.toArray
             parseRow (boardString |> Seq.toList) |> innerParseBoard size
-
             
         let startingPos (doc:Response.Root) = doc.Hero.Pos.Y + doc.Hero.Pos.X*doc.Game.Board.Size
         
         let adjs (doc:Response.Root) = parseBoard doc.Game.Board.Size doc.Game.Board.Tiles 
-
-
 
         let findTile (doc:Response.Root) collector = 
             bfs2 (startingPos doc) collector (adjs doc)

@@ -1,8 +1,7 @@
 ﻿namespace Fsvd
-
-    open FSharp.Data
-
     module Client = 
+        open FSharp.Data
+        open System
         open Shared
         open Ai
 
@@ -10,31 +9,18 @@
         open HttpContentTypes
         open Game
 
-        [<Literal>]
-        let apiKey = "05erfbm8"
-        [<Literal>]
-        let uriBase = "http://vindinium.org/api/training"
+        type Client(apiKey: string, live: bool, turns: string) = 
 
+            [<Literal>]
+            let uriBase = "http://vindinium.org/api/"
 
-        
-        let move playUrl direction = 
-            let response = Http.RequestString(playUrl, query = [ "key", apiKey; "dir", direction], headers = [ Accept Json ], httpMethod="POST")
-            Response.Parse(response)
+            let headers = [ Accept Json ]
 
+            member this.Move playUrl direction = 
+                let response = Http.RequestString(playUrl, query = [ "key", apiKey; "dir", direction], headers = headers, httpMethod="POST")
+                Response.Parse(response)
 
-        let rec moveHero playUrl myHeroId (tiles: BfsAdjVertex list) = 
-
-            let doc = move playUrl (direction tiles)
-
-            let tilesOfInterest = findTile doc (ai doc)
-
-            if not doc.Game.Finished then
-                moveHero doc.PlayUrl doc.Hero.Id tilesOfInterest
-            
-        let createGame =
-            let response = Http.RequestString(uriBase, query = [ "key", apiKey; "turns", "300" ], headers = [ Accept Json ], httpMethod="POST")
-            let doc = Response.Parse(response)
-            System.Diagnostics.Process.Start(doc.ViewUrl) |> ignore
-
-            let tilesOfInterest = findTile doc (ai doc)
-            moveHero doc.PlayUrl doc.Hero.Id tilesOfInterest |> ignore
+            member this.CreateGame =
+                let url = (new Uri(new Uri(uriBase), (if live then "arena" else "training"))).ToString()
+                let response = Http.RequestString(url, query = [ "key", apiKey; "turns", turns], headers = headers, httpMethod="POST")
+                Response.Parse(response)

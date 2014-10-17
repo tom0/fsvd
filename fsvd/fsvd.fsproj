@@ -25,6 +25,8 @@
     <PlatformTarget>AnyCPU</PlatformTarget>
     <DocumentationFile>bin\Debug\fsvd.XML</DocumentationFile>
     <Prefer32Bit>true</Prefer32Bit>
+    <StartArguments>
+    </StartArguments>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <DebugType>pdbonly</DebugType>
@@ -59,6 +61,7 @@
     <None Include="packages.config" />
     <Compile Include="Ai.fs" />
     <Compile Include="Client.fs" />
+    <Compile Include="Bot.fs" />
     <Compile Include="Program.fs" />
   </ItemGroup>
   <PropertyGroup>
