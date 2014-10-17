@@ -1,6 +1,6 @@
 ﻿namespace Fsvd
 
-    module Ai =
+    module Ai = 
         open Shared
 
         let mineCollector myHeroId tile =
