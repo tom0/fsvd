@@ -1,1 +1,4 @@
-fsvd.v12.suo
+fsvd/bin*
+fsvd/obj*
+packages*
+*.suo
