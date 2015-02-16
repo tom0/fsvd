@@ -3,22 +3,26 @@
     module Ai = 
         open Shared
 
-        let ai (doc:Response.Root) =
+        let ai (doc:Response.Root) (tiles: BfsAdjVertex list) =
 
             let myHero = doc.Hero
             let game = doc.Game
 
-            let mineCollector tile =
-                match tile with
-                | (Mine x) as m when x <> (Some myHero.Id) -> Some(m)
-                | _ -> None 
+            let tavernFilter (vertex:BfsAdjVertex) =
+                match vertex.vertex.tile with
+                | Tavern -> true
+                | _ -> false
 
-            let tavernCollector tile =
-                match tile with
-                | Tavern as m -> Some(m)
-                | _ -> None 
+            let mineFilter (vertex:BfsAdjVertex) =
+                match vertex.vertex.tile with
+                | Mine None -> true
+                | Mine (Some x) when x <> myHero.Id -> true
+                | _ -> false
 
-            match Shared.distance (Game.findTile doc tavernCollector) with
-            | Some(healthDistance) when healthDistance <= 1 && myHero.Life < 90 -> tavernCollector
-            | _ when myHero.Life < 30 -> tavernCollector
-            | _ -> mineCollector
+            let filter = 
+                if myHero.Life <= 30 then
+                    tavernFilter
+                else
+                    mineFilter
+            
+            tiles |> List.filter filter |> List.sortBy (fun v -> v.distance) |> List.head

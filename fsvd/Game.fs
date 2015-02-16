@@ -10,7 +10,7 @@
             | '3' -> tileCtor 3
             | '4' -> tileCtor 4
 
-        let parseRow rowChars = 
+        let parseBoardChars rowChars = 
             let rec innerParseRow rowChars acc =
                 match rowChars with
                 | [] -> List.rev acc
@@ -20,7 +20,6 @@
                 | '['::_::xs -> innerParseRow xs (Tavern :: acc)
                 | ' '::_::xs -> innerParseRow xs (Free :: acc)
                 | _::_::xs -> innerParseRow xs (Forest :: acc)
-
             innerParseRow rowChars []
 
         let tavernHeroMineCollector tile = 
@@ -30,10 +29,6 @@
             | Mine x as m -> Some(m)
             | _ -> None 
         
-        let nullCollector tile = 
-            match tile with
-            | _ -> None 
-
         let rec bfs (work: BfsAdjVertex list) (adjacencyList:(Tile * seq<AdjVertex>)[]) (collector: Tile -> Option<Tile>) (visited:Set<int>) (acc:BfsAdjVertex list) : BfsAdjVertex list =
             match work with
             | [] -> acc
@@ -74,11 +69,18 @@
                     
                 let adjacencyList = vertexList |> Seq.mapi (fun i v -> v, adjacencyListPrepare i)
                 adjacencyList |> Seq.toArray
-            parseRow (boardString |> Seq.toList) |> innerParseBoard size
+            parseBoardChars (boardString |> Seq.toList) |> innerParseBoard size
             
         let startingPos (doc:Response.Root) = doc.Hero.Pos.Y + doc.Hero.Pos.X*doc.Game.Board.Size
         
         let adjs (doc:Response.Root) = parseBoard doc.Game.Board.Size doc.Game.Board.Tiles 
 
-        let findTile (doc:Response.Root) collector = 
-            bfs2 (startingPos doc) collector (adjs doc)
+        let tileCollector tile = 
+            match tile with
+            | Forest | Tavern | Mine _ | Hero _ as t -> Some(t)
+            | _ -> None
+
+        let findTiles (doc:Response.Root) = 
+            let starting = (startingPos doc)
+            printfn "%A" starting
+            bfs2 starting tileCollector (adjs doc)
