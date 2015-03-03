@@ -71,7 +71,7 @@
                 adjacencyList |> Seq.toArray
             parseBoardChars (boardString |> Seq.toList) |> innerParseBoard size
             
-        let startingPos (doc:Response.Root) = doc.Hero.Pos.Y + doc.Hero.Pos.X*doc.Game.Board.Size
+        let startingPos (hero:Response.Hero) boardSize = hero.Pos.Y + hero.Pos.X*boardSize
         
         let adjs (doc:Response.Root) = parseBoard doc.Game.Board.Size doc.Game.Board.Tiles 
 
@@ -80,7 +80,6 @@
             | Forest | Tavern | Mine _ | Hero _ as t -> Some(t)
             | _ -> None
 
-        let findTiles (doc:Response.Root) = 
-            let starting = (startingPos doc)
-            printfn "%A" starting
-            bfs2 starting tileCollector (adjs doc)
+        let findTiles boardSize adjacencyLists (hero:Response.Hero) = 
+            let starting = (startingPos hero boardSize)
+            bfs2 starting tileCollector adjacencyLists

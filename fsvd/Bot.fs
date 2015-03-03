@@ -14,17 +14,20 @@
                     | ex -> printf "Couldn't open browser: %s" (ex.ToString())
                 printf "ViewUrl: %s" url
 
-            let rec innerBotLoop playUrl myHeroId (tile: BfsAdjVertex) = 
+            let getTargetTile doc =
+                let adjacencyLists = adjs doc
+                let heroTiles = doc.Game.Heroes |> Array.map (fun h -> { Id = h.Id; Tiles = findTiles doc.Game.Board.Size adjacencyLists h } )
+                ai doc heroTiles
+
+            let rec innerBotLoop playUrl (tile: BfsAdjVertex option) = 
                 let firstStep = (findFirstStep tile |> sprintf "%A")
                 let doc = client.Move playUrl firstStep 
-                let tiles = findTiles doc 
-                let nextTile = ai doc (tiles)
+                let nextTile = getTargetTile doc
                 if not doc.Game.Finished then
-                    innerBotLoop doc.PlayUrl doc.Hero.Id nextTile
+                    innerBotLoop doc.PlayUrl nextTile
 
             let cg = client.CreateGame
             Task.Run(fun () -> startBrowser cg.ViewUrl) |> ignore
 
-            let tiles = findTiles cg 
-            let tileOfInterest = ai cg tiles
-            innerBotLoop cg.PlayUrl cg.Hero.Id tileOfInterest 
+            let nextTile = getTargetTile cg
+            innerBotLoop cg.PlayUrl nextTile 

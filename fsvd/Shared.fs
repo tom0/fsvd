@@ -8,8 +8,10 @@
         type Tile = Free | Forest | Mine of Option<int> | Hero of int | Tavern
         type AdjVertex = { id: int; tile: Tile; direction: Direction }
         type BfsAdjVertex = { source: Option<BfsAdjVertex>; distance: int; vertex: AdjVertex }
+        type HeroTiles = { Id: int; Tiles: BfsAdjVertex list }
         
         let rec findFirstStep tile =
             match tile with 
-            | { source = Some { source = None }; vertex = v } -> v.direction
-            | { source = Some x } as t -> findFirstStep x
+            | Some { source = Some { source = None }; vertex = v } -> v.direction
+            | Some { source = Some x } as t -> findFirstStep (Some x)
+            | None -> Stay
